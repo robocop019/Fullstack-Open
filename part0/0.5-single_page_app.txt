@@ -1,0 +1,9 @@
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/spa
+server-->browser: HTML-code
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/spa.css
+server-->browser: spa.css
+browser->server: HTTP GET https://fullstack-exampleapp.herokuapp.com/spa.js
+server-->browser: spa.js
+
+browser-->server HTTP GET https://fullstack-exampleapp.herokuapp.com/data.json
+server-->browser: data.json
