@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import noteService from './services/notes'
 import Note from './components/Note'
 
 const App = () => {
@@ -8,15 +8,12 @@ const App = () => {
 	const [showAll, setShowAll] = useState(true)
 
 	useEffect(() => {
-		console.log('Effect')
-		axios
-			.get('http://localhost:3001/notes')
-			.then(response => {
-				console.log('Promise Fullfilled')
-				setNotes(response.data)
+		noteService
+			.getAll()
+			.then(initialNotes => {
+				setNotes(initialNotes)
 			})
 	}, [])
-	console.log('Render', notes.length, 'Notes')
 
 
 	const notesToShow = showAll ? notes : notes.filter((note) => note.important)
@@ -26,8 +23,22 @@ const App = () => {
 	}
 
 	const handleNoteChange = (event) => {
-		console.log(event.target.value)
 		setNewNote(event.target.value)
+	}
+
+	const toggleImportanceOf = (id) => {
+		const note = notes.find(n => n.id === id)
+		const changedNote = { ...note, important: !note.important }
+		
+		noteService
+			.update(id, changedNote)
+			.then(returnedNote => {
+				setNotes(notes.map((note) => note.id !== id ? note : returnedNote))
+			})
+			.catch(error => {
+				alert(`The note '${note.content}' has been removed from the server`)
+				setNotes(notes.filter(n => n.id !== id))
+			})
 	}
 
 	const addNote = (event) => {
@@ -35,12 +46,15 @@ const App = () => {
 		const noteObject = {
 			content: newNote,
 			date: new Date().toISOString(),
-			important: Math.random() < 0.5,
-			id: notes.length + 1,
+			important: Math.random() < 0.5
 		}
 
-		setNotes(notes.concat(noteObject))
-		setNewNote('')
+		noteService
+			.create(noteObject)
+			.then(returnedNote => {
+				setNotes(notes.concat(returnedNote))
+				setNewNote('')
+			})
 	}
 
 	return (
@@ -55,7 +69,11 @@ const App = () => {
 
 			<ul>
 				{notesToShow.map((note) => (
-					<Note key={note.id} note={note} />
+					<Note
+						key={note.id}
+						note={note}
+						toggleImportance={() => toggleImportanceOf(note.id)}
+					/>
 				))}
 			</ul>
 
