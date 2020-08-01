@@ -7,9 +7,13 @@ import personService from './services/persons'
 
 const App = () => {
 	const [persons, setPersons] = useState([])
+	const [filter, setFilter] = useState('')
 	const [newName, setNewName] = useState('')
 	const [newNumber, setNewNumber] = useState('')
 	const [notificationMessage, setNotificationMessage] = useState(null)
+
+	const filteredPeople = (filter.length === 0) ? persons
+			: persons.filter((person) => person.name.toLowerCase().indexOf(filter.toLowerCase()) > -1)
 
 	useEffect(() => {
 		personService
@@ -18,6 +22,11 @@ const App = () => {
 				setPersons(initialPersons)
 			})
 	}, [])
+
+	const handleFilterChange = (event) => {
+		setFilter(event.target.value)
+		
+	}
 
 	const handleNameChange = (event) => {
 		setNewName(event.target.value)
@@ -73,6 +82,11 @@ const App = () => {
 		<div>
 			<h1>Phonebook</h1>
 
+			Filter List: <input 
+				onChange={handleFilterChange}	
+				value={filter}
+			/>
+
 			<Notification message={notificationMessage} />
 
 			<h3>Add a New Person</h3>
@@ -87,7 +101,7 @@ const App = () => {
 
 			<h2>Numbers</h2>
 
-			{persons.map((person) => (
+			{filteredPeople.map((person) => (
 				<Person
 					key={person.id}
 					person={person}
