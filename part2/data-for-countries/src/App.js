@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import Country from './Country'
 import './App.css'
 
 const App = () => {
@@ -14,21 +15,13 @@ const App = () => {
 			})
 	}, [])
 
-	const displayCountries = [...countries]
-
-	let display = countries.map((country) => (country.name))
-
 	const handleChange = (event) => {
 		setSearch(event.target.value)
 	}
 
+	const displayCountries = countries.filter((country) => (country.name.toLowerCase().indexOf(search.toLowerCase()) > -1))
 
-	if (display.length > 10) {
-		display = 'Too many matches, please narrow down'
-	} else if (display.length === 1) {
-	} else {
-		display = 'jdkfdksdfkefiwesd'
-	}
+	console.log(displayCountries)
 
 	return (
 		<div>
@@ -38,9 +31,7 @@ const App = () => {
 					value={search}
 				/>
 			</div>
-			<div className='countryList'>
-				<p>{display}</p>
-			</div>
+			<Country countries={displayCountries} />
 		</div>
 	)
 }
